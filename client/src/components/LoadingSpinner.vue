@@ -6,9 +6,3 @@
     </span>
   </div>
 </template>
-
-<!-- <script>
-export default {
-  name: "loadingSpinner",
-};
-</script> -->
