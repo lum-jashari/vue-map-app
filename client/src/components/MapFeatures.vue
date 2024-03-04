@@ -17,7 +17,13 @@ const props = defineProps({
     required: true,
   },
 });
-const emit = defineEmits(["plotResult", "toggleSearchResults", "removeResult"]);
+
+const emit = defineEmits([
+  "plotResult",
+  "toggleSearchResults",
+  "removeResult",
+  "getGeoLocation",
+]);
 
 const searchQuery = ref(null);
 const searchData = ref(null);
@@ -43,7 +49,6 @@ const search = () => {
       );
       searchData.value = getData.data.features;
     }
-    console.log(searchData.value);
   }, 750);
 };
 
@@ -112,12 +117,12 @@ const removeResult = () => {
     </div>
     <!-- Geolocation -->
     <div
-      class="px-4 bg-white flex items-center shadow-md rounded-md min-h-[45px]"
+      class="px-4 flex bg-white items-center shadow-md rounded-md min-h-[45px] cursor-pointer"
       :class="{ 'bg-slate-600': coords }"
-      @click="$emit('getGetLocation')"
+      @click="$emit('getGeoLocation')"
     >
       <i
-        class="fas fa-solid fa-location-arrow text-state-600 text-[18px]"
+        class="fas fa-solid fa-location-arrow text-slate-600 text-[18px]"
         :class="{
           'text-white': coords,
           'animate-pulse': fetchCoords,

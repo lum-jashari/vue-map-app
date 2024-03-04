@@ -8,7 +8,20 @@ import blueMarker from "../assets/map-marker-blue.svg";
 import GeoErrorModal from "@/components/GeoErrorModal.vue";
 import MapFeatures from "@/components/MapFeatures.vue";
 
+const coords = ref(null);
+const fetchCoords = ref(false);
+const geoMarker = ref(null);
+
+const geoError = ref(null);
+const geoErrorMessage = ref("");
+
+const searchResults = ref(null);
+const resultsMarker = ref(null);
+
 let map;
+
+//----------------------------------INITIAL PLOTTING------------------------------------------
+
 onMounted(() => {
   // init map
   map = leaflet.map("map").setView([28.538336, -81.379234], 10);
@@ -32,25 +45,10 @@ onMounted(() => {
   map.on("moveend", () => {
     closeSearchResults();
   });
-  getGeolocation();
+  getGeoLocation();
 });
 
-const coords = ref(null);
-const fetchCoords = ref(false);
-const geoMarker = ref(null);
-
-const geoError = ref(null);
-const geoErrorMessage = ref("");
-
-const searchResults = ref(null);
-const toggleSearchResults = () => {
-  searchResults.value = !searchResults.value;
-};
-const closeSearchResults = () => {
-  searchResults.value = null;
-};
-
-const getGeolocation = () => {
+const getGeoLocation = () => {
   if (coords.value) {
     coords.value = null;
     sessionStorage.removeItem("coords");
@@ -84,12 +82,6 @@ const setCoords = (pos) => {
   plotGeoLocation(coords.value);
 };
 
-const getLocError = (error) => {
-  fetchCoords.value = null;
-  geoError.value = true;
-  geoErrorMessage.value = error.message;
-};
-
 const plotGeoLocation = (coords) => {
   //  create custom marker
   const customMarker = leaflet.icon({
@@ -106,12 +98,20 @@ const plotGeoLocation = (coords) => {
   map.setView([coords.lat, coords.lng], 10);
 };
 
+//----------------------------------ERROR HANDLING------------------------------------------
+
+const getLocError = (error) => {
+  fetchCoords.value = null;
+  geoError.value = true;
+  geoErrorMessage.value = error.message;
+};
 const closeGeoError = () => {
   geoError.value = null;
   geoErrorMessage.value = null;
 };
 
-const resultsMarker = ref(null);
+//----------------------------------SEARCH HANDLING------------------------------------------
+
 const plotResult = (coords) => {
   // Check for resultMarker value
   if (resultsMarker.value) {
@@ -135,9 +135,14 @@ const plotResult = (coords) => {
 
   closeSearchResults();
 };
-
 const removeResult = () => {
   map.removeLayer(resultsMarker.value);
+};
+const toggleSearchResults = () => {
+  searchResults.value = !searchResults.value;
+};
+const closeSearchResults = () => {
+  searchResults.value = null;
 };
 </script>
 
@@ -149,7 +154,7 @@ const removeResult = () => {
       :geoErrorMessage="geoErrorMessage"
     />
     <MapFeatures
-      @getGetLocation="getGeolocation"
+      @getGeoLocation="getGeoLocation"
       @plotResult="plotResult"
       @toggleSearchResults="toggleSearchResults"
       @removeResult="removeResult"
