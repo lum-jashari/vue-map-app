@@ -11,7 +11,7 @@ import MapFeatures from "@/components/MapFeatures.vue";
 let map;
 onMounted(() => {
   // init map
-  const icon = (map = leaflet.map("map").setView([28.538336, -81.379234], 10));
+  map = leaflet.map("map").setView([28.538336, -81.379234], 10);
   // add tile layer
   leaflet
     .tileLayer(
@@ -28,6 +28,10 @@ onMounted(() => {
       }
     )
     .addTo(map);
+
+  map.on("moveend", () => {
+    closeSearchResults();
+  });
   getGeolocation();
 });
 
@@ -37,6 +41,14 @@ const geoMarker = ref(null);
 
 const geoError = ref(null);
 const geoErrorMessage = ref("");
+
+const searchResults = ref(null);
+const toggleSearchResults = () => {
+  searchResults.value = !searchResults.value;
+};
+const closeSearchResults = () => {
+  searchResults.value = null;
+};
 
 const getGeolocation = () => {
   if (coords.value) {
@@ -119,7 +131,9 @@ const plotResult = (coords) => {
     .addTo(map);
 
   // set map view to current location
-  map.setView([coords.coordinates[1], coords.coordinates[0]], 10);
+  map.setView([coords.coordinates[1], coords.coordinates[0]], 14);
+
+  closeSearchResults();
 };
 </script>
 
@@ -133,8 +147,10 @@ const plotResult = (coords) => {
     <MapFeatures
       @getGetLocation="getGeolocation"
       @plotResult="plotResult"
+      @toggleSearchResults="toggleSearchResults"
       :coords="coords"
       :fetchCoords="fetchCoords"
+      :searchResults="searchResults"
     />
     <div id="map" class="h-full z-[1]"></div>
   </div>

@@ -12,8 +12,12 @@ const props = defineProps({
     type: null,
     required: true,
   },
+  searchResults: {
+    type: null,
+    required: true,
+  },
 });
-const emit = defineEmits(["plotResult"]);
+const emit = defineEmits(["plotResult", "toggleSearchResults"]);
 
 const searchQuery = ref(null);
 const searchData = ref(null);
@@ -60,6 +64,7 @@ const selectResult = (result) => {
         placeholder="Start your search"
         v-model="searchQuery"
         @input="search"
+        @focus="$emit('toggleSearchResults')"
       />
       <!-- Search Icon -->
       <div class="absolute top-0 left-[8px] h-full flex items-center">
@@ -69,7 +74,7 @@ const selectResult = (result) => {
       <div class="absolute mt-2 w-full">
         <!-- Results -->
         <div
-          v-if="searchQuery"
+          v-if="searchQuery && searchResults"
           class="h-[200px] overflow-scroll bg-white rounded-md"
         >
           <!-- Loading -->
