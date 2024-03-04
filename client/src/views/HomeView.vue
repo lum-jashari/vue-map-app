@@ -10,9 +10,8 @@ import MapFeatures from "@/components/MapFeatures.vue";
 
 let map;
 onMounted(() => {
-  const icon =
-    // init map
-    (map = leaflet.map("map").setView([28.538336, -81.379234], 10));
+  // init map
+  const icon = (map = leaflet.map("map").setView([28.538336, -81.379234], 10));
   // add tile layer
   leaflet
     .tileLayer(
@@ -33,13 +32,19 @@ onMounted(() => {
 });
 
 const coords = ref(null);
-const fetchCoords = ref(null);
+const fetchCoords = ref(false);
 const geoMarker = ref(null);
 
 const geoError = ref(null);
 const geoErrorMessage = ref("");
 
 const getGeolocation = () => {
+  if (coords.value) {
+    coords.value = null;
+    sessionStorage.removeItem("coords");
+    map.removeLayer(geoMarker.value);
+    return;
+  }
   // check session storage for coords
   if (sessionStorage.getItem("coords")) {
     coords.value = JSON.parse(sessionStorage.getItem("coords"));
@@ -102,7 +107,11 @@ const closeGeoError = () => {
       v-if="geoError"
       :geoErrorMessage="geoErrorMessage"
     />
-    <MapFeatures />
+    <MapFeatures
+      @getGetLocation="getGeolocation"
+      :coords="coords"
+      :fetchCoords="fetchCoords"
+    />
     <div id="map" class="h-full z-[1]"></div>
   </div>
 </template>

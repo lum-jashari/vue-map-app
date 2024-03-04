@@ -1,4 +1,18 @@
-<script setup></script>
+<script setup>
+console.log("test");
+// const props = defineProps(["coords", "fetchCoords"]);
+const props = defineProps({
+  coords: {
+    type: null,
+    required: true,
+  },
+  fetchCoords: {
+    type: null,
+    required: true,
+  },
+});
+console.log(props);
+</script>
 
 <template>
   <div
@@ -7,8 +21,16 @@
     <!-- Geolocation -->
     <div
       class="px-4 bg-white flex items-center shadow-md rounded-md min-h-[45px]"
+      :class="{ 'bg-slate-600': coords }"
+      @click="$emit('getGetLocation')"
     >
-      <i class="fa-solid fa-location-arrow text-slate-600 text-[18px]"></i>
+      <i
+        class="fas fa-solid fa-location-arrow text-state-600 text-[18px]"
+        :class="{
+          'text-white': coords,
+          'animate-pulse': fetchCoords,
+        }"
+      ></i>
     </div>
   </div>
 </template>
