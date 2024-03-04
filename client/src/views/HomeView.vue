@@ -1,8 +1,11 @@
 <script setup>
 import leaflet from "leaflet";
 import { onMounted, ref } from "vue";
+
 import redMarker from "../assets/map-marker-red.svg";
 import blueMarker from "../assets/map-marker-blue.svg";
+
+import GeoErrorModal from "@/components/icons/GeoErrorModal.vue";
 
 let map;
 onMounted(() => {
@@ -32,10 +35,20 @@ const coords = ref(null);
 const fetchCoords = ref(null);
 const geoMarker = ref(null);
 
+const geoError = ref(null);
+const geoErrorMessage = ref("");
+
 const getGeolocation = () => {
+  // check session storage for coords
+  if (sessionStorage.getItem("coords")) {
+    coords.value = JSON.parse(sessionStorage.getItem("coords"));
+    plotGeoLocation(coords.value);
+    return;
+  }
   fetchCoords.value = true;
   navigator.geolocation.getCurrentPosition(setCoords, getLocError);
 };
+
 const setCoords = (pos) => {
   // stop fetching coords
   fetchCoords.value = null;
@@ -52,8 +65,11 @@ const setCoords = (pos) => {
 
   plotGeoLocation(coords.value);
 };
+
 const getLocError = (error) => {
-  console.log(error);
+  fetchCoords.value = null;
+  geoError.value = true;
+  geoErrorMessage.value = error.message;
 };
 
 const plotGeoLocation = (coords) => {
@@ -71,10 +87,20 @@ const plotGeoLocation = (coords) => {
   // set map view to current location
   map.setView([coords.lat, coords.lng], 10);
 };
+
+const closeGeoError = () => {
+  geoError.value = null;
+  geoErrorMessage.value = null;
+};
 </script>
 
 <template>
   <div class="h-screen relative">
+    <GeoErrorModal
+      @closeGeoError="closeGeoError"
+      v-if="geoError"
+      :geoErrorMessage="geoErrorMessage"
+    />
     <div id="map" class="h-full z-[1]"></div>
   </div>
 </template>
