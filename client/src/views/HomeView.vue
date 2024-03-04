@@ -5,7 +5,8 @@ import { onMounted, ref } from "vue";
 import redMarker from "../assets/map-marker-red.svg";
 import blueMarker from "../assets/map-marker-blue.svg";
 
-import GeoErrorModal from "@/components/icons/GeoErrorModal.vue";
+import GeoErrorModal from "@/components/GeoErrorModal.vue";
+import MapFeatures from "@/components/MapFeatures.vue";
 
 let map;
 onMounted(() => {
@@ -101,6 +102,7 @@ const closeGeoError = () => {
       v-if="geoError"
       :geoErrorMessage="geoErrorMessage"
     />
+    <MapFeatures />
     <div id="map" class="h-full z-[1]"></div>
   </div>
 </template>
