@@ -1,7 +1,8 @@
 <script setup>
 import { ref } from "vue";
+import axios from "axios";
+import LoadingSpinner from "./LoadingSpinner.vue";
 
-console.log("test");
 const props = defineProps({
   coords: {
     type: null,
@@ -12,13 +13,33 @@ const props = defineProps({
     required: true,
   },
 });
-console.log(props);
 
 const searchQuery = ref(null);
 const searchData = ref(null);
 const queryTimeout = ref(null);
 
-const search = () => {};
+const search = () => {
+  clearTimeout(queryTimeout.value);
+  searchData.value = null;
+
+  queryTimeout.value = setTimeout(async () => {
+    if (searchQuery.value !== "") {
+      const params = new URLSearchParams({
+        fuzzyMatch: true,
+        language: "en",
+        limit: 10,
+        proximity: props.coords
+          ? `${props.coords.lng}, ${props.coords.lat}`
+          : "0,0",
+      });
+      const getData = await axios.get(
+        `http://localhost:3000/api/search/${searchQuery.value}?${params}`
+      );
+      searchData.value = getData.data.features;
+      console.log(searchData.value);
+    }
+  }, 750);
+};
 </script>
 
 <template>
@@ -33,6 +54,7 @@ const search = () => {};
         type="text"
         placeholder="Start your search"
         v-model="searchQuery"
+        @input="search"
       />
       <!-- Search Icon -->
       <div class="absolute top-0 left-[8px] h-full flex items-center">
@@ -41,12 +63,21 @@ const search = () => {};
       <!-- Search Results -->
       <div class="absolute mt-2 w-full">
         <!-- Results -->
-        <div class="h-[200px] overflow-scroll bg-white rounded-md">
-          <div
-            class="px-4 py-2 flex gap-x-2 cursor-pointer hover:bg-slate-600 hover:text-white"
-          >
-            <i class="fa-solid fa-location-dot"></i>
-            <p class="text-xs">Testing results</p>
+        <div
+          v-if="searchQuery"
+          class="h-[200px] overflow-scroll bg-white rounded-md"
+        >
+          <!-- Loading -->
+          <LoadingSpinner v-if="!searchData" />
+          <div v-else>
+            <div
+              class="px-4 py-2 flex gap-x-2 cursor-pointer hover:bg-slate-600 hover:text-white"
+              v-for="(result, index) in searchData"
+              :key="index"
+            >
+              <i class="fa-solid fa-location-dot"></i>
+              <p class="text-xs">{{ result.place_name_en }}</p>
+            </div>
           </div>
         </div>
       </div>
