@@ -135,6 +135,10 @@ const plotResult = (coords) => {
 
   closeSearchResults();
 };
+
+const removeResult = () => {
+  map.removeLayer(resultsMarker.value);
+};
 </script>
 
 <template>
@@ -148,6 +152,7 @@ const plotResult = (coords) => {
       @getGetLocation="getGeolocation"
       @plotResult="plotResult"
       @toggleSearchResults="toggleSearchResults"
+      @removeResult="removeResult"
       :coords="coords"
       :fetchCoords="fetchCoords"
       :searchResults="searchResults"

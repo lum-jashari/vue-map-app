@@ -17,11 +17,12 @@ const props = defineProps({
     required: true,
   },
 });
-const emit = defineEmits(["plotResult", "toggleSearchResults"]);
+const emit = defineEmits(["plotResult", "toggleSearchResults", "removeResult"]);
 
 const searchQuery = ref(null);
 const searchData = ref(null);
 const queryTimeout = ref(null);
+const selectedResult = ref(null);
 
 const search = () => {
   clearTimeout(queryTimeout.value);
@@ -41,13 +42,19 @@ const search = () => {
         `http://localhost:3000/api/search/${searchQuery.value}?${params}`
       );
       searchData.value = getData.data.features;
-      console.log(searchData.value);
     }
+    console.log(searchData.value);
   }, 750);
 };
 
 const selectResult = (result) => {
+  selectedResult.value = result;
   emit("plotResult", result.geometry);
+};
+
+const removeResult = () => {
+  selectedResult.value = null;
+  emit("removeResult");
 };
 </script>
 
@@ -90,6 +97,16 @@ const selectResult = (result) => {
               <p class="text-xs">{{ result.place_name_en }}</p>
             </div>
           </div>
+        </div>
+        <!-- Selected Search Result -->
+        <div v-if="selectedResult" class="mt-2 px-4 py-3 bg-white rounded-md">
+          <i
+            @click="removeResult"
+            class="fa-regular fa-circle-xmark flex justify-end cursor-pointer"
+          ></i>
+          <h1 class="text-lg">{{ selectedResult.text }}</h1>
+          <p class="text-xs mb-1">{{ selectedResult.properties.address }}</p>
+          <p class="text-xs">{{ selectedResult.properties.category }}</p>
         </div>
       </div>
     </div>
