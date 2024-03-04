@@ -98,6 +98,29 @@ const closeGeoError = () => {
   geoError.value = null;
   geoErrorMessage.value = null;
 };
+
+const resultsMarker = ref(null);
+const plotResult = (coords) => {
+  // Check for resultMarker value
+  if (resultsMarker.value) {
+    map.removeLayer(resultsMarker.value);
+  }
+  //  create custom marker
+  const customMarker = leaflet.icon({
+    iconUrl: blueMarker,
+    iconSize: [35, 35],
+  });
+
+  //create new marker with coords and custom icon
+  resultsMarker.value = leaflet
+    .marker([coords.coordinates[1], coords.coordinates[0]], {
+      icon: customMarker,
+    })
+    .addTo(map);
+
+  // set map view to current location
+  map.setView([coords.coordinates[1], coords.coordinates[0]], 10);
+};
 </script>
 
 <template>
@@ -109,6 +132,7 @@ const closeGeoError = () => {
     />
     <MapFeatures
       @getGetLocation="getGeolocation"
+      @plotResult="plotResult"
       :coords="coords"
       :fetchCoords="fetchCoords"
     />

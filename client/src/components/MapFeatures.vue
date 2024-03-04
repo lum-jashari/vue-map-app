@@ -13,6 +13,7 @@ const props = defineProps({
     required: true,
   },
 });
+const emit = defineEmits(["plotResult"]);
 
 const searchQuery = ref(null);
 const searchData = ref(null);
@@ -39,6 +40,10 @@ const search = () => {
       console.log(searchData.value);
     }
   }, 750);
+};
+
+const selectResult = (result) => {
+  emit("plotResult", result.geometry);
 };
 </script>
 
@@ -74,6 +79,7 @@ const search = () => {
               class="px-4 py-2 flex gap-x-2 cursor-pointer hover:bg-slate-600 hover:text-white"
               v-for="(result, index) in searchData"
               :key="index"
+              @click="selectResult(result)"
             >
               <i class="fa-solid fa-location-dot"></i>
               <p class="text-xs">{{ result.place_name_en }}</p>
